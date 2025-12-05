@@ -1,153 +1,93 @@
 """
 Goals Prediction Page
-Predicts number of goals a player will score
 """
 
 import streamlit as st
-import pandas as pd
-import numpy as np
+import time
 from utils.model_loader import load_model, prepare_input_dataframe
+from utils.ui import show_fullscreen_bounce
+from utils.ui import show_fullscreen_bounce
 
 def show():
     """Display the Goals prediction page."""
-    st.markdown("<h1>⚽ Goals Prediction</h1>", unsafe_allow_html=True)
-    st.markdown(
-        "<p style='color: white; font-size: 1.1rem; margin-bottom: 2rem;'>"
-        "Predict how many goals a player will score</p>",
-        unsafe_allow_html=True
-    )
+    st.markdown("<h1 style='text-align: center; text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);'>⚽ GOAL PREDICTOR</h1>", unsafe_allow_html=True)
     
     # Load model
     try:
         model, features = load_model('goals')
-        st.success("✅ Model loaded successfully!")
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         return
     
-    # Display feature input form
-    st.markdown("<h2 style='color: white;'>Enter Player Statistics</h2>", unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
+    # Layout
+    col1, col2 = st.columns([1, 2])
     
     with col1:
-        st.markdown("#### Basic Information")
+        st.markdown("""
+<div class="glass-card">
+    <h3 style="color: #39FF14; margin-top: 0;">PLAYER STATS</h3>
+</div>
+""", unsafe_allow_html=True)
+        
         position = st.selectbox("Position", ['AT', 'MT', 'DF', 'GK'], index=0)
-        age = st.number_input("Age", value=31, min_value=16, max_value=45, step=1, help="Sample: Mohamed Salah")
-        matches_played = st.number_input("Matches Played", value=32, min_value=0, max_value=50, step=1, help="Sample: Mohamed Salah")
-        starts = st.number_input("Starts", value=28, min_value=0, max_value=50, step=1, help="Sample: Mohamed Salah")
-        minutes = st.number_input("Minutes Played", value=2536, min_value=0, step=10, help="Sample: Mohamed Salah")
-        ninety_s = st.number_input("90s Played", value=28.2, min_value=0.0, step=0.1, help="Sample: Mohamed Salah")
-        
-        st.markdown("#### Discipline")
-        penalty_goals = st.number_input("Penalty Goals Made", value=5, min_value=0, step=1, help="Sample: Mohamed Salah")
-        penalty_attempts = st.number_input("Penalty Attempts", value=7, min_value=0, step=1, help="Sample: Mohamed Salah")
-        yellow_cards = st.number_input("Yellow Cards", value=2, min_value=0, step=1, help="Sample: Mohamed Salah")
-        red_cards = st.number_input("Red Cards", value=0, min_value=0, step=1, help="Sample: Mohamed Salah")
-    
+        age = st.number_input("Age", value=31, min_value=16, max_value=45, step=1)
+        matches_played = st.number_input("Matches", value=32, min_value=0, max_value=50, step=1)
+        starts = st.number_input("Starts", value=28, min_value=0, max_value=50, step=1)
+        minutes = st.number_input("Minutes", value=2536, min_value=0, step=10)
+        ninety_s = st.number_input("90s Played", value=28.2, min_value=0.0, step=0.1)
+        xG = st.number_input("xG", value=21.1, min_value=0.0, step=0.1)
+        npxG = st.number_input("npxG", value=15.6, min_value=0.0, step=0.1)
+        xAG = st.number_input("xAG", value=11.4, min_value=0.0, step=0.1)
+        npxG_xAG = st.number_input("npxG + xAG", value=27.0, min_value=0.0, step=0.1)
+        progressive_carries = st.number_input("Prog. Carries", value=107, min_value=0, step=1)
+        progressive_passes = st.number_input("Prog. Passes", value=149, min_value=0, step=1)
+        progressive_receives = st.number_input("Prog. Receives", value=348, min_value=0, step=1)
+
     with col2:
-        st.markdown("#### Expected Goals (xG) Metrics")
-        xG = st.number_input("xG (Expected Goals)", value=21.1, min_value=0.0, step=0.1, help="Sample: Mohamed Salah")
-        npxG = st.number_input("npxG (Non-Penalty xG)", value=15.6, min_value=0.0, step=0.1, help="Sample: Mohamed Salah")
-        xAG = st.number_input("xAG (Expected Assisted Goals)", value=11.4, min_value=0.0, step=0.1, help="Sample: Mohamed Salah")
-        npxG_xAG = st.number_input("npxG + xAG", value=27.0, min_value=0.0, step=0.1, help="Sample: Mohamed Salah")
+        st.markdown("""
+<div class="glass-card" style="text-align: center;">
+    <h3 style="color: #39FF14;">SCORING POTENTIAL</h3>
+    <p style="color: #b0b3b8;">Analyze player data to forecast goal tally.</p>
+</div>
+""", unsafe_allow_html=True)
         
-        st.markdown("#### Advanced Metrics")
-        progressive_carries = st.number_input("Progressive Carries", value=107, min_value=0, step=1, help="Sample: Mohamed Salah")
-        progressive_passes = st.number_input("Progressive Passes", value=149, min_value=0, step=1, help="Sample: Mohamed Salah")
-        progressive_receives = st.number_input("Progressive Receives", value=348, min_value=0, step=1, help="Sample: Mohamed Salah")
-        
-        st.markdown("#### Per 90 Stats")
-        xG_per90 = st.number_input("xG Per 90", value=0.75, min_value=0.0, step=0.01, help="Sample: Mohamed Salah")
-        xAG_per90 = st.number_input("xAG Per 90", value=0.41, min_value=0.0, step=0.01, help="Sample: Mohamed Salah")
-        npxG_per90 = st.number_input("npxG Per 90", value=0.55, min_value=0.0, step=0.01, help="Sample: Mohamed Salah")
-    
-    # Predict button
-    if st.button("🔮 Predict Goals", use_container_width=True):
-        # Prepare input data
-        input_data = {
-            'Position': position,
-            'Age': age,
-            'Matches Played': matches_played,
-            'Starts': starts,
-            'Minutes': minutes,
-            '90s Played': ninety_s,
-            'Penalty Goals Made': penalty_goals,
-            'Penalty Attempts': penalty_attempts,
-            'Yellow Cards': yellow_cards,
-            'Red Cards': red_cards,
-            'xG': xG,
-            'npxG': npxG,
-            'xAG': xAG,
-            'npxG + xAG': npxG_xAG,
-            'Progressive Carries': progressive_carries,
-            'Progressive Passes': progressive_passes,
-            'Progressive Receives': progressive_receives,
-            'xG Per 90': xG_per90,
-            'xAG Per 90': xAG_per90,
-            'npxG Per 90': npxG_per90
-        }
-        
-        # Create DataFrame
-        X = prepare_input_dataframe(input_data, features)
-        
-        # Make prediction
-        raw_prediction = model.predict(X)[0]
-        predicted_goals = int(round(raw_prediction))
-        
-        # Display results
-        st.markdown("---")
-        st.markdown("<h2 style='color: white;'>Prediction Results</h2>", unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            # Determine category
-            if predicted_goals >= 20:
-                category = "Elite Scorer"
-                color = "#f59e0b" # Amber
-                glow = "0 0 20px #f59e0b"
-                icon = "🌟"
-            elif predicted_goals >= 10:
-                category = "Consistent Scorer"
-                color = "#10b981" # Emerald
-                glow = "0 0 20px #10b981"
-                icon = "⚽"
-            elif predicted_goals >= 5:
-                category = "Contributing Player"
-                color = "#3b82f6" # Blue
-                glow = "0 0 20px #3b82f6"
-                icon = "📊"
-            else:
-                category = "Limited Scoring"
-                color = "#9ca3af" # Gray
-                glow = "none"
-                icon = "📉"
+        if st.button("⚽ PREDICT GOALS", use_container_width=True):
+            show_fullscreen_bounce("ESTIMATING GOAL TALLY...", seconds=3.2)
             
-            st.markdown(
-                f"<div class='result-card' style='text-align: center; padding: 2rem; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);'>"
-                f"<div class='result-title' style='color: #94a3b8; font-size: 1.2rem; margin-bottom: 1rem;'>PREDICTED GOALS</div>"
-                f"<div class='result-value' style='color: {color}; font-size: 5rem; font-weight: 800; text-shadow: {glow}; line-height: 1;'>{icon} {predicted_goals}</div>"
-                f"<div class='result-subtitle' style='color: white; font-size: 1.5rem; margin-top: 1rem; font-weight: 600;'>{category}</div>"
-                "</div>",
-                unsafe_allow_html=True
-            )
-        
-        # Show detailed metrics
-        st.markdown("### Performance Analysis")
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            goals_per_90 = (predicted_goals / ninety_s) if ninety_s > 0 else 0
-            st.metric("Predicted Goals/90", f"{goals_per_90:.2f}")
-        with col2:
-            st.metric("Expected Goals (xG)", f"{xG:.1f}")
-        with col3:
-            overperformance = predicted_goals - xG
-            st.metric("Over/Under xG", f"{overperformance:+.1f}",
-                     delta="Overperforming" if overperformance > 0 else "Underperforming")
-        with col4:
-            if penalty_attempts > 0:
-                penalty_conversion = (penalty_goals / penalty_attempts) * 100
-                st.metric("Penalty Conversion", f"{penalty_conversion:.0f}%")
+            xG_per90 = xG / ninety_s if ninety_s > 0 else 0
+            xAG_per90 = xAG / ninety_s if ninety_s > 0 else 0
+            npxG_per90 = npxG / ninety_s if ninety_s > 0 else 0
+            
+            input_data = {
+                'Position': position, 'Age': age, 'Matches Played': matches_played,
+                'Starts': starts, 'Minutes': minutes, '90s Played': ninety_s,
+                'Penalty Goals Made': 5, 'Penalty Attempts': 7, 'Yellow Cards': 2, 'Red Cards': 0,
+                'xG': xG, 'npxG': npxG, 'xAG': xAG, 'npxG + xAG': npxG_xAG,
+                'Progressive Carries': progressive_carries, 'Progressive Passes': progressive_passes,
+                'Progressive Receives': progressive_receives,
+                'xG Per 90': xG_per90, 'xAG Per 90': xAG_per90, 'npxG Per 90': npxG_per90
+            }
+            
+            X = prepare_input_dataframe(input_data, features)
+            predicted_goals = int(round(model.predict(X)[0]))
+            
+            if predicted_goals >= 20:
+                category, color, icon = "Elite Scorer", "#ffd700", "🌟"
+            elif predicted_goals >= 10:
+                category, color, icon = "Consistent Scorer", "#10b981", "⚽"
             else:
-                st.metric("Penalties", "0")
+                category, color, icon = "Contributing Player", "#3b82f6", "📊"
+            
+            st.markdown(f"""
+<div class="glass-card" style="text-align: center; border: 2px solid {color}; box-shadow: 0 0 30px {color};">
+    <div style="font-size: 1.2rem; color: #b0b3b8;">PREDICTED GOALS</div>
+    <div style="font-size: 5rem; font-weight: 800; color: {color}; text-shadow: 0 0 20px {color};">{icon} {predicted_goals}</div>
+    <div style="font-size: 1.5rem; color: white;">{category}</div>
+</div>
+""", unsafe_allow_html=True)
+            
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.metric("Goals per 90", f"{predicted_goals/ninety_s:.2f}" if ninety_s > 0 else "0")
+            with col_b:
+                st.metric("xG Performance", f"{predicted_goals - xG:+.1f}")

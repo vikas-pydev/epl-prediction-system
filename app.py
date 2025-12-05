@@ -20,60 +20,6 @@ st.markdown("""
     [data-testid="stSidebarNav"] {
         display: none;
     }
-    
-    /* Custom Floating Hamburger Button - Always Visible */
-    .custom-menu-btn {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 999999;
-        background: rgba(0, 242, 255, 0.1);
-        border: 2px solid #00f2ff;
-        border-radius: 8px;
-        padding: 0.75rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        width: 40px;
-        height: 40px;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .custom-menu-btn:hover {
-        background: rgba(0, 242, 255, 0.2);
-        box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
-        transform: scale(1.05);
-    }
-    
-    .custom-menu-btn span {
-        width: 20px;
-        height: 2px;
-        background: #00f2ff;
-        display: block;
-        transition: all 0.3s ease;
-    }
-    
-    /* Style Streamlit's collapse button when it appears */
-    [data-testid="collapsedControl"], [data-testid="stSidebarCollapsedControl"] {
-        background: rgba(0, 242, 255, 0.1) !important;
-        border: 2px solid #00f2ff !important;
-        border-radius: 8px !important;
-        color: #00f2ff !important;
-    }
-    
-    [data-testid="collapsedControl"]:hover, [data-testid="stSidebarCollapsedControl"]:hover {
-        background: rgba(0, 242, 255, 0.2) !important;
-        box-shadow: 0 0 20px rgba(0, 242, 255, 0.4) !important;
-    }
-    
-    [data-testid="collapsedControl"] svg, [data-testid="stSidebarCollapsedControl"] svg {
-        color: #00f2ff !important;
-        fill: #00f2ff !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -84,8 +30,7 @@ st.markdown(get_custom_css(), unsafe_allow_html=True)
 if 'current_page' not in st.session_state:
     st.session_state.current_page = 'home'
 
-def go_to_page(page_name):
-    """Navigate to a specific page."""
+def nav(page_name, message=""):
     st.session_state.current_page = page_name
     st.rerun()
 
@@ -93,167 +38,145 @@ def go_to_page(page_name):
 if st.session_state.current_page == 'home':
     # Hero Section
     st.markdown("""
-<div class="float-animation" style="text-align: center; margin-bottom: 2rem; padding: 4rem 0; background: radial-gradient(circle at center, rgba(0, 242, 255, 0.1) 0%, transparent 70%);">
-    <h1 style="margin-bottom: 0.5rem;">PREMIER LEAGUE</h1>
-    <h1 style="margin-top: -1rem; color: var(--text-primary);">INTELLIGENCE</h1>
-    <p style="font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 3rem; letter-spacing: 0.1em;">
-        POWERED BY ADVANCED METRICS & THE EXCLUSIVE SCORESIGHT ENGINE
+<div style="text-align: center; padding: 4rem 0;">
+    <h1 style="font-size: 4rem; margin-bottom: 0; text-shadow: 0 0 30px rgba(57, 255, 20, 0.5);">PREMIER LEAGUE</h1>
+    <h1 style="font-size: 4rem; margin-top: 0; color: #39FF14;">INTELLIGENCE</h1>
+    <p style="font-size: 1.3rem; color: #b0b3b8; letter-spacing: 3px; margin-top: 1rem;">
+        ELITE ANALYTICS • POWERED BY SCORESIGHT™
     </p>
 </div>
 """, unsafe_allow_html=True)
     
-    # Enter Arena Button (Centered)
+    # Enter Arena Button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        # We use a custom styled button here
-        st.markdown("""
-<style>
-div.stButton > button:first-child {
-    background: rgba(0, 242, 255, 0.1);
-    border: 2px solid #00f2ff;
-    color: #00f2ff;
-    font-size: 1.5rem;
-    padding: 1rem 2rem;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
-}
-div.stButton > button:first-child:hover {
-    background: #00f2ff;
-    color: black;
-    box-shadow: 0 0 50px rgba(0, 242, 255, 0.6);
-}
-</style>
-""", unsafe_allow_html=True)
-        if st.button("ENTER THE ARENA", use_container_width=True):
-            go_to_page('match_winner')
+        if st.button("⚽ ENTER THE ARENA", use_container_width=True):
+            nav('match_winner', "Entering Arena...")
             
-    st.markdown("<div style='height: 4rem'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 3rem'></div>", unsafe_allow_html=True)
     
     # Feature Cards Grid
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("""
-<div class="glass-card stagger-1">
-    <h3>🏆 Match Winner</h3>
-    <p style="color: #94a3b8; margin-bottom: 1.5rem;">Predict the outcome of individual matches with high accuracy.</p>
+<div class="glass-card">
+    <h3 style="color: #39FF14;">🏆 MATCH WINNER</h3>
+    <p style="color: #b0b3b8;">Predict match outcomes with elite accuracy.</p>
 </div>
 """, unsafe_allow_html=True)
-        if st.button("Launch Predictor", key="btn_match"):
-            go_to_page('match_winner')
+        if st.button("LAUNCH", key="btn_match"):
+            nav('match_winner', "Loading Match Predictor...")
             
-        st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
         
         st.markdown("""
-<div class="glass-card stagger-1">
-    <h3>📊 Total Points</h3>
-    <p style="color: #94a3b8; margin-bottom: 1.5rem;">Forecast final team standings and total points.</p>
+<div class="glass-card">
+    <h3 style="color: #00f2ff;">📊 TOTAL POINTS</h3>
+    <p style="color: #b0b3b8;">Forecast final league standings.</p>
 </div>
 """, unsafe_allow_html=True)
-        if st.button("View Projections", key="btn_points"):
-            go_to_page('total_points')
+        if st.button("PROJECT", key="btn_points"):
+            nav('total_points', "Loading Points Model...")
 
     with col2:
         st.markdown("""
-<div class="glass-card stagger-2">
-    <h3>👑 League Winner</h3>
-    <p style="color: #94a3b8; margin-bottom: 1.5rem;">Identify the potential champion of the season.</p>
+<div class="glass-card">
+    <h3 style="color: #ffd700;">👑 LEAGUE WINNER</h3>
+    <p style="color: #b0b3b8;">Identify the potential champion.</p>
 </div>
 """, unsafe_allow_html=True)
-        if st.button("See Champion", key="btn_league"):
-            go_to_page('league_winner')
+        if st.button("PREDICT", key="btn_league"):
+            nav('league_winner', "Loading Title Model...")
             
-        st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
         
         st.markdown("""
-<div class="glass-card stagger-2">
-    <h3>⚽ Player Goals</h3>
-    <p style="color: #94a3b8; margin-bottom: 1.5rem;">Predict top scorers and goal tallies.</p>
+<div class="glass-card">
+    <h3 style="color: #39FF14;">⚽ PLAYER GOALS</h3>
+    <p style="color: #b0b3b8;">Analyze top scorers and goal tallies.</p>
 </div>
 """, unsafe_allow_html=True)
-        if st.button("Analyze Goals", key="btn_goals"):
-            go_to_page('goals')
+        if st.button("ANALYZE", key="btn_goals"):
+            nav('goals', "Loading Goals Model...")
 
     with col3:
         st.markdown("""
-<div class="glass-card stagger-3">
-    <h3>🎯 Player Assists</h3>
-    <p style="color: #94a3b8; margin-bottom: 1.5rem;">Track playmakers and assist leaders.</p>
+<div class="glass-card">
+    <h3 style="color: #00f2ff;">🎯 PLAYER ASSISTS</h3>
+    <p style="color: #b0b3b8;">Track playmakers and assist leaders.</p>
 </div>
 """, unsafe_allow_html=True)
-        if st.button("Track Assists", key="btn_assists"):
-            go_to_page('assists')
+        if st.button("TRACK", key="btn_assists"):
+            nav('assists', "Loading Assists Model...")
             
-        st.markdown("<div style='height: 2rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
         
-        # Stats/Info Card
         st.markdown("""
-<div class="glass-card pulse-glow stagger-3" style="border-color: var(--primary-color);">
-    <h3 style="color: var(--primary-color)">🚀 AI Powered</h3>
-    <p style="color: #94a3b8;">Our models use advanced algorithms to analyze historical data and current form.</p>
+<div class="glass-card pulse-glow" style="border-color: #39FF14;">
+    <h3 style="color: #39FF14;">🚀 AI POWERED</h3>
+    <p style="color: #b0b3b8;">Real-time machine learning analysis.</p>
 </div>
 """, unsafe_allow_html=True)
 
 # Import and display pages based on navigation
 elif st.session_state.current_page == 'match_winner':
-    if st.button("← Back to Home", key="back_match"):
-        go_to_page('home')
+    if st.button("← BACK TO HOME", key="back_match"):
+        nav('home', "Returning...")
     from pages import match_winner
     match_winner.show()
     
 elif st.session_state.current_page == 'league_winner':
-    if st.button("← Back to Home", key="back_league"):
-        go_to_page('home')
+    if st.button("← BACK TO HOME", key="back_league"):
+        nav('home', "Returning...")
     from pages import league_winner
     league_winner.show()
     
 elif st.session_state.current_page == 'total_points':
-    if st.button("← Back to Home", key="back_points"):
-        go_to_page('home')
+    if st.button("← BACK TO HOME", key="back_points"):
+        nav('home', "Returning...")
     from pages import total_points
     total_points.show()
     
 elif st.session_state.current_page == 'goals':
-    if st.button("← Back to Home", key="back_goals"):
-        go_to_page('home')
+    if st.button("← BACK TO HOME", key="back_goals"):
+        nav('home', "Returning...")
     from pages import goals
     goals.show()
     
 elif st.session_state.current_page == 'assists':
-    if st.button("← Back to Home", key="back_assists"):
-        go_to_page('home')
+    if st.button("← BACK TO HOME", key="back_assists"):
+        nav('home', "Returning...")
     from pages import assists
     assists.show()
 
-# Sidebar Navigation (Always visible)
+# Sidebar Navigation
 with st.sidebar:
     st.markdown("""
 <div style="text-align: center; margin-bottom: 2rem;">
-    <h1 style="font-size: 2rem; margin: 0;">⚽</h1>
-    <h3 style="margin: 0; color: var(--primary-color);">EPL PREDICTOR</h3>
+    <h1 style="font-size: 3rem; margin: 0;">⚽</h1>
+    <h3 style="margin: 0; color: #39FF14;">EPL PREDICTOR</h3>
+    <p style="color: #b0b3b8; font-size: 0.8rem;">v2.0 Elite</p>
 </div>
 """, unsafe_allow_html=True)
     
     if st.button("🏠 DASHBOARD", use_container_width=True):
-        go_to_page('home')
+        nav('home', "Loading Dashboard...")
     
-    st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
-    st.markdown("<p style='color: var(--text-secondary); font-size: 0.7rem; letter-spacing: 0.1em; margin-bottom: 0.5rem;'>MODELS</p>", unsafe_allow_html=True)
+    st.markdown("<hr style='border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #b0b3b8; font-size: 0.7rem; letter-spacing: 2px;'>MODELS</p>", unsafe_allow_html=True)
     
     if st.button("🏆 MATCH WINNER", key="sb_match", use_container_width=True):
-        go_to_page('match_winner')
+        nav('match_winner', "Loading Match Predictor...")
     
     if st.button("👑 LEAGUE WINNER", key="sb_league", use_container_width=True):
-        go_to_page('league_winner')
+        nav('league_winner', "Loading Title Model...")
     
     if st.button("📊 TOTAL POINTS", key="sb_points", use_container_width=True):
-        go_to_page('total_points')
+        nav('total_points', "Loading Points Model...")
     
     if st.button("⚽ PLAYER GOALS", key="sb_goals", use_container_width=True):
-        go_to_page('goals')
+        nav('goals', "Loading Goals Model...")
     
     if st.button("🎯 PLAYER ASSISTS", key="sb_assists", use_container_width=True):
-        go_to_page('assists')
-    
-    st.markdown("<div style='margin-top: auto; padding-top: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.8rem;'>v2.0 • AI Powered</div>", unsafe_allow_html=True)
+        nav('assists', "Loading Assists Model...")
