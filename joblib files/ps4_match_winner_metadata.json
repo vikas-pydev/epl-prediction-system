@@ -1,0 +1,25 @@
+{
+    "timestamp": "2025-12-04 23:33:07",
+    "best_model": "NeuralNetwork",
+    "metrics": {
+        "Model": "NeuralNetwork",
+        "Accuracy": 0.6600877192982456,
+        "Precision": 0.6591455329642419,
+        "Recall": 0.6600877192982456,
+        "F1_Score": 0.6587641338813824,
+        "F1_Macro": 0.6561169630476561
+    },
+    "features_used": [
+        "Points_Gap",
+        "Goal_Difference_Gap",
+        "Form_Gap",
+        "Home_Goal_Difference",
+        "Away_Goal_Difference",
+        "Home_Win_Streak",
+        "Away_Win_Streak",
+        "Home_Goals_Scored",
+        "Away_Goals_Scored",
+        "Home_Goals_Conceded"
+    ],
+    "random_state": 42
+}

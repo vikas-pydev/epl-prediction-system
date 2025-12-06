@@ -7,8 +7,21 @@ def get_custom_css():
     """Return custom CSS for beautiful UI styling."""
     return """
 <style>
-/* Import Fonts - Oswald & Roboto Condensed */
+/* Import Fonts - Oswald & Roboto Condensed + Material Icons */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;700&family=Roboto+Condensed:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* CLEAN SOLUTION: Hide all sidebar toggle controls completely */
+/* The sidebar is always expanded by default, so users can still navigate */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebar"] button[kind="header"],
+[data-testid="stSidebar"] [data-testid="stBaseButton-header"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
 
 /* Global Variables - Stadium Night Theme */
 :root {
@@ -86,14 +99,63 @@ p, div, span, label, input, button, li {
     box-shadow: 0 0 20px var(--primary-accent) !important;
 }
 
-/* Inputs - Cyan Focus */
+/* Inputs - Cyan Focus with VISIBLE TEXT */
 .stTextInput > div > div > input,
-.stNumberInput > div > div > input,
-.stSelectbox > div > div {
+.stNumberInput > div > div > input {
     background-color: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--glass-border) !important;
-    color: white !important;
+    color: #000000 !important;
     border-radius: 8px !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Selectbox with white background */
+.stSelectbox > div > div {
+    background-color: #ffffff !important;
+    border: 1px solid var(--glass-border) !important;
+    color: #000000 !important;
+    border-radius: 8px !important;
+}
+
+.stSelectbox > div > div > div {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Dropdown menu options */
+[data-baseweb="select"] > div,
+[data-baseweb="popover"] {
+    background-color: #ffffff !important;
+}
+
+[data-baseweb="menu"] {
+    background-color: #ffffff !important;
+}
+
+[data-baseweb="menu"] li {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+[data-baseweb="menu"] li:hover {
+    background-color: #f0f0f0 !important;
+}
+
+/* Force visible text in all input fields - BLACK text on white bg */
+input[type="text"], 
+input[type="number"],
+.stTextInput input,
+.stNumberInput input {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    opacity: 1 !important;
+    caret-color: #000000 !important;
+}
+
+/* Input placeholder text - dark gray */
+input::placeholder {
+    color: rgba(0, 0, 0, 0.5) !important;
+    -webkit-text-fill-color: rgba(0, 0, 0, 0.5) !important;
 }
 
 .stTextInput > div > div > input:focus,

@@ -6,7 +6,6 @@ import streamlit as st
 import time
 from utils.model_loader import load_model, prepare_input_dataframe
 from utils.ui import show_fullscreen_bounce
-from utils.ui import show_fullscreen_bounce
 
 def show():
     """Display the Assists prediction page."""
@@ -19,31 +18,36 @@ def show():
         st.error(f"Error loading model: {str(e)}")
         return
     
-    # Layout
-    col1, col2 = st.columns([1, 2])
+    # Layout: inputs on left, prediction on right
+    col_input, col_result = st.columns([1, 2])
     
-    with col1:
+    with col_input:
         st.markdown("""
 <div class="glass-card">
     <h3 style="color: #00f2ff; margin-top: 0;">PLAYMAKER STATS</h3>
 </div>
 """, unsafe_allow_html=True)
         
-        position = st.selectbox("Position", ['AT', 'MT', 'DF', 'GK'], index=0)
-        age = st.number_input("Age", value=31, min_value=16, max_value=45, step=1)
-        matches_played = st.number_input("Matches", value=32, min_value=0, max_value=50, step=1)
-        starts = st.number_input("Starts", value=28, min_value=0, max_value=50, step=1)
-        minutes = st.number_input("Minutes", value=2536, min_value=0, step=10)
-        ninety_s = st.number_input("90s Played", value=28.2, min_value=0.0, step=0.1)
-        xG = st.number_input("xG", value=21.1, min_value=0.0, step=0.1)
-        npxG = st.number_input("npxG", value=15.6, min_value=0.0, step=0.1)
-        xAG = st.number_input("xAG", value=11.4, min_value=0.0, step=0.1)
-        npxG_xAG = st.number_input("npxG + xAG", value=27.0, min_value=0.0, step=0.1)
-        progressive_carries = st.number_input("Prog. Carries", value=107, min_value=0, step=1)
-        progressive_passes = st.number_input("Prog. Passes", value=149, min_value=0, step=1)
-        progressive_receives = st.number_input("Prog. Receives", value=348, min_value=0, step=1)
-
-    with col2:
+        # Two sub-columns for inputs
+        sub1, sub2 = st.columns(2)
+        
+        with sub1:
+            position = st.selectbox("Position", ['Forward', 'Midfielder', 'Defender', 'Goalkeeper'], index=1)
+            age = st.number_input("Age", value=25, min_value=16, max_value=45, step=1)
+            matches_played = st.number_input("Matches Played", value=30, min_value=0, max_value=50, step=1)
+            starts = st.number_input("Starts", value=30, min_value=0, max_value=50, step=1)
+            minutes = st.number_input("Minutes Played", value=2700, min_value=0, step=10)
+        
+        with sub2:
+            goals_per_90 = st.number_input("Goals per 90", value=0.50, min_value=0.0, step=0.01)
+            assists_per_90 = st.number_input("Assists per 90", value=0.20, min_value=0.0, step=0.01)
+            xg_per_90 = st.number_input("xG per 90", value=0.45, min_value=0.0, step=0.01)
+            npxg_per_90 = st.number_input("npxG per 90", value=0.40, min_value=0.0, step=0.01)
+            xag_per_90 = st.number_input("xAG per 90", value=0.20, min_value=0.0, step=0.01)
+            npxg_plus_xag_per_90 = st.number_input("npxG + xAG", value=0.60, min_value=0.0, step=0.01)
+            non_penalty_goals_per_90 = st.number_input("Non-Penalty Goals per 90", value=0.40, min_value=0.0, step=0.01)
+    
+    with col_result:
         st.markdown("""
 <div class="glass-card" style="text-align: center;">
     <h3 style="color: #00f2ff;">CREATIVITY ENGINE</h3>
@@ -54,18 +58,30 @@ def show():
         if st.button("🎯 PREDICT ASSISTS", use_container_width=True):
             show_fullscreen_bounce("ESTIMATING ASSIST TALLY...", seconds=3.2)
             
-            xG_per90 = xG / ninety_s if ninety_s > 0 else 0
-            xAG_per90 = xAG / ninety_s if ninety_s > 0 else 0
-            npxG_per90 = npxG / ninety_s if ninety_s > 0 else 0
+            # Calculate derived features
+            goals_per_xg = goals_per_90 / xg_per_90 if xg_per_90 > 0 else 1.0
+            assists_per_xag = assists_per_90 / xag_per_90 if xag_per_90 > 0 else 1.0
+            xag_impact = xag_per_90 - assists_per_90
+            npxg_impact = npxg_per_90 - non_penalty_goals_per_90
             
+            # Input data matching the 16 features required by the model
             input_data = {
-                'Position': position, 'Age': age, 'Matches Played': matches_played,
-                'Starts': starts, 'Minutes': minutes, '90s Played': ninety_s,
-                'Penalty Goals Made': 5, 'Penalty Attempts': 7, 'Yellow Cards': 2, 'Red Cards': 0,
-                'xG': xG, 'npxG': npxG, 'xAG': xAG, 'npxG + xAG': npxG_xAG,
-                'Progressive Carries': progressive_carries, 'Progressive Passes': progressive_passes,
-                'Progressive Receives': progressive_receives,
-                'xG Per 90': xG_per90, 'xAG Per 90': xAG_per90, 'npxG Per 90': npxG_per90
+                'position': position,
+                'age': age,
+                'matches_played': matches_played,
+                'starts': starts,
+                'minutes': minutes,
+                'goals_per_90': goals_per_90,
+                'assists_per_90': assists_per_90,
+                'xg_per_90': xg_per_90,
+                'npxg_per_90': npxg_per_90,
+                'xag_per_90': xag_per_90,
+                'npxg_plus_xag_per_90': npxg_plus_xag_per_90,
+                'non_penalty_goals_per_90': non_penalty_goals_per_90,
+                'goals_per_xg': goals_per_xg,
+                'assists_per_xag': assists_per_xag,
+                'xag_impact': xag_impact,
+                'npxg_impact': npxg_impact
             }
             
             X = prepare_input_dataframe(input_data, features)
@@ -77,6 +93,8 @@ def show():
                 category, color, icon = "Creative Force", "#10b981", "🎯"
             else:
                 category, color, icon = "Contributing Player", "#3b82f6", "📊"
+            
+            ninety_s = minutes / 90 if minutes > 0 else 1
             
             st.markdown(f"""
 <div class="glass-card" style="text-align: center; border: 2px solid {color}; box-shadow: 0 0 30px {color};">
@@ -90,4 +108,5 @@ def show():
             with col_a:
                 st.metric("Assists per 90", f"{predicted_assists/ninety_s:.2f}" if ninety_s > 0 else "0")
             with col_b:
-                st.metric("xAG Performance", f"{predicted_assists - xAG:+.1f}")
+                xag_total = xag_per_90 * ninety_s
+                st.metric("xAG Performance", f"{predicted_assists - xag_total:+.1f}")

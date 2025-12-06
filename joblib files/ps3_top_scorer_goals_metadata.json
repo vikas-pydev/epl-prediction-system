@@ -1,0 +1,14 @@
+{
+    "target": "goals",
+    "model_type": "RandomForest",
+    "metrics": {
+        "test_r2": 0.9797875803743864,
+        "cv_r2": 0.9826624367437816
+    },
+    "best_params": {
+        "model": "RandomForest",
+        "rf_n_estimators": 299,
+        "rf_max_depth": 20,
+        "rf_min_samples_split": 2
+    }
+}

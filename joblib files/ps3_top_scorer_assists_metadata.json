@@ -1,0 +1,16 @@
+{
+    "target": "assists",
+    "model_type": "XGBoost",
+    "metrics": {
+        "test_r2": 0.9823493361473083,
+        "cv_r2": 0.9772233565648397
+    },
+    "best_params": {
+        "model": "XGBoost",
+        "xgb_n_estimators": 67,
+        "xgb_learning_rate": 0.25112315517699807,
+        "xgb_max_depth": 3,
+        "xgb_subsample": 0.999831747209385,
+        "xgb_colsample_bytree": 0.9850300777065139
+    }
+}

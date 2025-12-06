@@ -6,11 +6,15 @@ import streamlit as st
 import time
 from utils.model_loader import load_model, prepare_input_dataframe
 from utils.ui import show_fullscreen_bounce
-from utils.ui import show_fullscreen_bounce
 
 def show():
     """Display the Total Points prediction page."""
-    st.markdown("<h1 style='text-align: center; text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);'>📊 POINTS PROJECTOR</h1>", unsafe_allow_html=True)
+    
+    # Clear old session state on page load
+    if 'total_points_result' in st.session_state:
+        del st.session_state.total_points_result
+    
+    st.markdown("<h1 style='text-align: center; color: #00f2ff; text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);'>TOTAL POINTS</h1>", unsafe_allow_html=True)
     
     # Load model
     try:
@@ -19,35 +23,43 @@ def show():
         st.error(f"Error loading model: {str(e)}")
         return
     
-    # Layout
-    col1, col2 = st.columns([1, 2])
+    # Layout: inputs on left, button and results on right
+    col_input, col_result = st.columns([1, 2])
     
-    with col1:
+    with col_input:
         st.markdown("""
 <div class="glass-card">
-    <h3 style="color: #00f2ff; margin-top: 0;">TEAM METRICS</h3>
+    <h3 style="color: #00f2ff; margin-top: 0;">📊 CURRENT SEASON STATS</h3>
 </div>
 """, unsafe_allow_html=True)
         
-        goals_scored = st.number_input("Goals Scored", value=96.0, min_value=0.0, step=1.0)
-        goals_conceded = st.number_input("Goals Conceded", value=34.0, min_value=0.0, step=1.0)
-        goal_difference = st.number_input("Goal Difference", value=62.0, step=1.0)
-
-    with col2:
+        # Input fields matching the image
+        played = st.number_input("Matches Played", value=20, min_value=0, max_value=38, step=1)
+        gf = st.number_input("Goals Scored (GF)", value=35, min_value=0, step=1)
+        ga = st.number_input("Goals Conceded (GA)", value=25, min_value=0, step=1)
+        
+        # Auto-calculate Goal Difference
+        gd = gf - ga
+        st.info(f"Calculated Goal Difference (GD): {gd}")
+    
+    with col_result:
         st.markdown("""
 <div class="glass-card" style="text-align: center;">
-    <h3 style="color: #00f2ff;">POINTS FORECAST</h3>
-    <p style="color: #b0b3b8;">Predict final points based on goal metrics.</p>
+    <p style="color: #ffd700;">👆 Enter current team stats to project the final season tally.</p>
 </div>
 """, unsafe_allow_html=True)
         
-        if st.button("📊 PROJECT POINTS", use_container_width=True):
-            show_fullscreen_bounce("RUNNING SEASON SIMULATION...", seconds=3.2)
+        # Predict Button on right side
+        if st.button("🏆 PREDICT FINAL POINTS", use_container_width=True):
+            show_fullscreen_bounce("PROJECTING FINAL POINTS...", seconds=3.2)
             
+            # Input data - include season_end_year with default value
             input_data = {
-                'goals_scored': goals_scored,
-                'goals_conceded': goals_conceded,
-                'goal_difference': goal_difference
+                'season_end_year': 2024,  # Current season
+                'played': played,
+                'gf': gf,
+                'ga': ga,
+                'gd': gd
             }
             
             X = prepare_input_dataframe(input_data, features)
@@ -65,11 +77,13 @@ def show():
             
             st.markdown(f"""
 <div class="glass-card" style="text-align: center; border: 2px solid {color}; box-shadow: 0 0 30px {color};">
-    <div style="font-size: 1.2rem; color: #b0b3b8;">PROJECTED FINISH</div>
+    <div style="font-size: 1.2rem; color: #b0b3b8;">PROJECTED POINTS</div>
     <div style="font-size: 5rem; font-weight: 800; color: {color}; text-shadow: 0 0 20px {color};">{icon} {predicted_points:.0f}</div>
     <div style="font-size: 1.5rem; color: white; margin-top: 0.5rem;">{category}</div>
 </div>
 """, unsafe_allow_html=True)
+            
+            st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
             
             col_a, col_b, col_c, col_d = st.columns(4)
             with col_a:

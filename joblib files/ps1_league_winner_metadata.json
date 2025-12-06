@@ -1,0 +1,40 @@
+{
+  "pipeline": "League Winner Prediction",
+  "problem_statement": "PS1 - League Winner",
+  "timestamp": "2025-12-04 18:54:29",
+  "best_model": "RandomForest",
+  "metrics": {
+    "Model": "RandomForest",
+    "Accuracy": 0.95,
+    "Precision": 0.975,
+    "Recall": 0.95,
+    "F1_Score": 0.9576576576576576
+  },
+  "all_results": [
+    {
+      "Model": "RandomForest",
+      "Accuracy": 0.95,
+      "Precision": 0.975,
+      "Recall": 0.95,
+      "F1_Score": 0.9576576576576576
+    },
+    {
+      "Model": "XGBoost",
+      "Accuracy": 0.95,
+      "Precision": 0.975,
+      "Recall": 0.95,
+      "F1_Score": 0.9576576576576576
+    }
+  ],
+  "features_used": [
+    "wins",
+    "draws",
+    "losses",
+    "points_per_game",
+    "goals_scored",
+    "goals_conceded"
+  ],
+  "target_column": "target_champion",
+  "random_state": 42,
+  "test_size": 0.25
+}
