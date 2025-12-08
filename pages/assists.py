@@ -36,16 +36,18 @@ def show():
             age = st.number_input("Age", value=25, min_value=16, max_value=45, step=1)
             matches_played = st.number_input("Matches Played", value=30, min_value=0, max_value=50, step=1)
             starts = st.number_input("Starts", value=30, min_value=0, max_value=50, step=1)
-            minutes = st.number_input("Minutes Played", value=2700, min_value=0, step=10)
         
         with sub2:
             goals_per_90 = st.number_input("Goals per 90", value=0.50, min_value=0.0, step=0.01)
             assists_per_90 = st.number_input("Assists per 90", value=0.20, min_value=0.0, step=0.01)
             xg_per_90 = st.number_input("xG per 90", value=0.45, min_value=0.0, step=0.01)
-            npxg_per_90 = st.number_input("npxG per 90", value=0.40, min_value=0.0, step=0.01)
             xag_per_90 = st.number_input("xAG per 90", value=0.20, min_value=0.0, step=0.01)
-            npxg_plus_xag_per_90 = st.number_input("npxG + xAG", value=0.60, min_value=0.0, step=0.01)
-            non_penalty_goals_per_90 = st.number_input("Non-Penalty Goals per 90", value=0.40, min_value=0.0, step=0.01)
+        
+        # Hidden fields with default values (required by model but not shown to user)
+        minutes = 2700
+        npxg_per_90 = 0.40
+        npxg_plus_xag_per_90 = 0.60
+        non_penalty_goals_per_90 = 0.40
     
     with col_result:
         st.markdown("""
